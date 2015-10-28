@@ -13,28 +13,53 @@ public enum Message {
   case ChannelPressure(channel: UInt8, pressure: UInt8)
   case PitchBend(channel: UInt8, pitch: UInt16)
 
+  static private let statusBit: UInt8 = 0b10000000
+  static private let dataMask: UInt8 = 0b01111111
+  static private let messageMask: UInt8 = 0b01110000
+  static private let channelMask: UInt8 = 0b00001111
+
+  private enum MessageValue : UInt8 {
+    case NoteOff
+    case NoteOn
+    case Aftertouch
+    case ControlChange
+    case ProgramChange
+    case ChannelPressure
+    case PitchBend
+  }
+
+  static private func isStatusByte(byte: UInt8) -> Bool {
+    return (byte & Message.statusBit) == Message.statusBit
+  }
+  static private func isDataByte(byte: UInt8) -> Bool {
+    return (byte & Message.statusBit) == 0
+  }
+
+  static private func statusMessage(byte: UInt8) -> MessageValue {
+    return MessageValue(rawValue: (byte & Message.messageMask) >> UInt8(4))!
+  }
+  static private func statusChannel(byte: UInt8) -> UInt8 {
+    return byte & Message.channelMask
+  }
+
   init?(byteGenerator pop: () -> UInt8) {
     let byte = pop()
-    if (byte & 0x80) == 0x80 { // Status byte
-      let message = byte & 0xF0
-      let channel = byte & 0x0F
-      switch message {
-      case 0x80: self = .NoteOff(channel: channel, key: pop(), velocity: pop())
-      case 0x90: self = .NoteOn(channel: channel, key: pop(), velocity: pop())
-      case 0xA0: self = .Aftertouch(channel: channel, key: pop(), pressure: pop())
-      case 0xB0: self = .ControlChange(channel: channel, controller: pop(), value: pop())
-      case 0xC0: self = .ProgramChange(channel: channel, programNumber: pop())
-      case 0xD0: self = .ChannelPressure(channel: channel, pressure: pop())
-      case 0xE0:
-        // From http://www.midi.org/techspecs/Messages.php
+    if Message.isStatusByte(byte) {
+      let channel = Message.statusChannel(byte)
+      switch Message.statusMessage(byte) {
+      case .NoteOff: self = .NoteOff(channel: channel, key: pop(), velocity: pop())
+      case .NoteOn: self = .NoteOn(channel: channel, key: pop(), velocity: pop())
+      case .Aftertouch: self = .Aftertouch(channel: channel, key: pop(), pressure: pop())
+      case .ControlChange: self = .ControlChange(channel: channel, controller: pop(), value: pop())
+      case .ProgramChange: self = .ProgramChange(channel: channel, programNumber: pop())
+      case .ChannelPressure: self = .ChannelPressure(channel: channel, pressure: pop())
+      case .PitchBend:
+        // From http://midi.org/techspecs/midimessages.php
         // The pitch bender is measured by a fourteen bit value. The first data byte contains the
         // least significant 7 bits. The second data bytes contains the most significant 7 bits.
-        let low = UInt16(pop() & 0x7F)
-        let high = UInt16(pop() & 0x7F)
+        let low = UInt16(pop())
+        let high = UInt16(pop())
         self = .PitchBend(channel: channel, pitch: (high << 7) | low)
-      default:
-        assert(false, "Unimplemented message \(byte)")
-        return nil
       }
       return
     }
