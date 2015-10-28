@@ -14,15 +14,9 @@ graph.start()
 hardware.addMessageObserverForDeviceNamed("Samson Carbon49 ") { (message: Message) -> Void in
   switch message {
   case .NoteOn(let channel, let key, let velocity):
-    XCPlaygroundPage.currentPage.captureValue(key, withIdentifier: "key")
-    XCPlaygroundPage.currentPage.captureValue(velocity, withIdentifier: "velocity")
-    key
-
     MusicDeviceMIDIEvent(musicDeviceNode.unit, UInt32(0x90 | channel), UInt32(key), UInt32(velocity), 0)
 
   case .NoteOff(let channel, let key, let velocity):
-    key
-
     MusicDeviceMIDIEvent(musicDeviceNode.unit, UInt32(0x80 | channel), UInt32(key), UInt32(velocity), 0)
 
   case .ControlChange(let channel, let controller, let value):
