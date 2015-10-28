@@ -19,8 +19,11 @@ enum Error: String, ErrorType {
 
   private static var map = ErrorMap()
 
-  init(_ status: OSStatus) {
-    self = Error(rawValue: Error.map.statusToLabel[status]!)!
+  init?(_ status: OSStatus) {
+    guard let label = Error.map.statusToLabel[status] else {
+      return nil
+    }
+    self = Error(rawValue: label)!
   }
 }
 

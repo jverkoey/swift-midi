@@ -4,42 +4,11 @@ import XCPlayground
 
 let hardware = Hardware()
 
-hardware.onSetupChanged {
-  let names = hardware.connectedDeviceNames()
-}
-
-let message = MIDIPacket()
-let children = Mirror(reflecting: message.data).children
-for child in children {
-  child.value
-}
-
 var instrument: UInt8 = 0
 
-/*
-var musicPlayer = UnsafeMutablePointer<MusicPlayer>.alloc(1)
-NewMusicPlayer(musicPlayer)
-
-var sequence = UnsafeMutablePointer<COpaquePointer>.alloc(1)
-NewMusicSequence(sequence)
-MusicSequenceSetSequenceType(sequence.memory, MusicSequenceType.Seconds)
-
-MusicPlayerSetSequence(musicPlayer.memory, sequence.memory)
-
-var tempoTrack = UnsafeMutablePointer<MusicTrack>.alloc(1)
-MusicSequenceGetTempoTrack(sequence.memory, tempoTrack)
-MusicTrackNewExtendedTempoEvent(tempoTrack.memory, 0, 60)
-
-var chordsTrack = UnsafeMutablePointer<MusicTrack>.alloc(1)
-MusicSequenceNewTrack(sequence.memory, chordsTrack)
-*/
-
 var processingGraph: AUGraph = nil
-withUnsafeMutablePointer(&processingGraph) { NewAUGraph($0) }
-
-print(Mirror(reflecting: hardware).children)
-for val in Mirror(reflecting: hardware).children {
-  print(val.value)
+if let error = Error(NewAUGraph(&processingGraph)) {
+  error
 }
 
 var cd = AudioComponentDescription(
@@ -119,5 +88,6 @@ hardware.addMessageObserverForDeviceNamed("Samson Carbon49 ") { (message: Messag
     break
   }
 }
+
 
 XCPlaygroundPage.currentPage.needsIndefiniteExecution = true

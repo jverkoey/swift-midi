@@ -22,6 +22,7 @@
 		66AE7A811BC4195B002765FF /* MIDIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AE7A7E1BC4195B002765FF /* MIDIExtensions.swift */; };
 		66AE7A821BC4195B002765FF /* PropertyReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AE7A7F1BC4195B002765FF /* PropertyReader.swift */; };
 		66AE7A841BC4211E002765FF /* Concurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AE7A831BC4211E002765FF /* Concurrency.swift */; };
+		66E43E731BE072CC00CE9861 /* Synthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E43E721BE072CC00CE9861 /* Synthesizer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +96,7 @@
 		66AE7A7F1BC4195B002765FF /* PropertyReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PropertyReader.swift; sourceTree = "<group>"; };
 		66AE7A831BC4211E002765FF /* Concurrency.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Concurrency.swift; sourceTree = "<group>"; };
 		66AE7A851BC5EA62002765FF /* Concurrency.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; name = Concurrency.playground; path = Playgrounds/Concurrency.playground; sourceTree = "<group>"; };
+		66E43E721BE072CC00CE9861 /* Synthesizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Synthesizer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +152,7 @@
 				66248B8B1BBC8B4A00BF7F9B /* LUMI.h */,
 				66248B951BBC8B6100BF7F9B /* Hardware.swift */,
 				66AE7A681BC08913002765FF /* Message.swift */,
+				66E43E721BE072CC00CE9861 /* Synthesizer.swift */,
 				66AE7A7C1BC4195B002765FF /* Internal */,
 				66AE7A6D1BC24AD6002765FF /* CoreFoundation */,
 				66AE7A761BC41206002765FF /* CoreMIDI */,
@@ -361,6 +364,7 @@
 				66AE7A791BC41206002765FF /* MIDIPacket+SequenceType.swift in Sources */,
 				66AE7A721BC24AD6002765FF /* CFString+Hashable.swift in Sources */,
 				66AE7A741BC24AD6002765FF /* Dictionary+GetWithDefault.swift in Sources */,
+				66E43E731BE072CC00CE9861 /* Synthesizer.swift in Sources */,
 				66AE7A691BC08913002765FF /* Message.swift in Sources */,
 				66AE7A801BC4195B002765FF /* Device.swift in Sources */,
 				66248B9A1BBC8B6100BF7F9B /* Hardware.swift in Sources */,

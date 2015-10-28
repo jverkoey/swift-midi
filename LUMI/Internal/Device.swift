@@ -65,12 +65,13 @@ extension Device {
     let portName = "\(name) to Swift"
     var portRef: MIDIPortRef = 0
 
-    var status: OSStatus
-
     if self.deviceRef == 0 {
-      status = MIDIEndpointGetDevice(endpointRef, &self.deviceRef)
-      guard status == noErr else { throw Error(status) }
+      if let error = Error(MIDIEndpointGetDevice(endpointRef, &self.deviceRef)) {
+        throw error
+      }
     }
+
+    var status: OSStatus
 
     if #available(iOS 9.0, OSX 10.11, *) {
       status = MIDIInputPortCreateWithBlock(self.clientRef, portName, &portRef)
@@ -85,12 +86,13 @@ extension Device {
         }, unsafeBitCast(self, UnsafeMutablePointer<Void>.self), &portRef)
     }
 
-    guard status == noErr else { throw Error(status) }
+    if let error = Error(status) {
+      throw error
+    }
 
-    status = MIDIPortConnectSource(portRef, endpointRef, nil)
-    guard status == noErr else {
+    if let error = Error(MIDIPortConnectSource(portRef, endpointRef, nil)) {
       MIDIPortDispose(portRef)
-      throw Error(status)
+      throw error
     }
 
     var endpoint = Endpoint(endpointRef)
@@ -103,15 +105,16 @@ extension Device {
     self.destinationEndpoints.append(endpoint)
 
     if self.deviceRef == 0 {
-      let status = MIDIEndpointGetDevice(endpointRef, &self.deviceRef)
-      guard status == noErr else { throw Error(status) }
+      if let error = Error(MIDIEndpointGetDevice(endpointRef, &self.deviceRef)) {
+        throw error
+      }
     }
   }
 
   private func didReceivePacketList(packetList: UnsafePointer<MIDIPacketList>) {
     guard let messageReceiver = self.messageReceiver else { return }
 
-    let messages: AnyGenerator<Message> = anyGenerator(FlattenGenerator(packetList.memory.generate()))
+    let messages = anyGenerator(FlattenGenerator(packetList.memory.generate()))
     messageReceiver.device(self, didSendMessages: messages)
   }
 }
