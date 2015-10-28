@@ -11,10 +11,15 @@ let outputNode = graph.createDefaultOutputNode()
 musicDeviceNode.connectTo(outputNode)
 graph.start()
 
+Message.MessageValue.NoteOn.rawValue
+
 hardware.addMessageObserverForDeviceNamed("Samson Carbon49 ") { (message: Message) -> Void in
+  message.statusByte()
+  
+  MusicDeviceMIDIEvent(musicDeviceNode.unit, UInt32(message.statusByte()), UInt32(message.data1Byte()), UInt32(message.data2Byte()), 0)
+  /*
   switch message {
   case .NoteOn(let channel, let key, let velocity):
-    MusicDeviceMIDIEvent(musicDeviceNode.unit, UInt32(0x90 | channel), UInt32(key), UInt32(velocity), 0)
 
   case .NoteOff(let channel, let key, let velocity):
     MusicDeviceMIDIEvent(musicDeviceNode.unit, UInt32(0x80 | channel), UInt32(key), UInt32(velocity), 0)
@@ -36,7 +41,7 @@ hardware.addMessageObserverForDeviceNamed("Samson Carbon49 ") { (message: Messag
   default:
     print("bob")
     break
-  }
+  }*/
 }
 
 
