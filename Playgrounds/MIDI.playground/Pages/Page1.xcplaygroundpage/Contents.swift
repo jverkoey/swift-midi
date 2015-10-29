@@ -6,6 +6,10 @@ let hardware = Hardware()
 let graph = AudioGraph()
 var instrument: UInt8 = 0
 
+hardware.onSetupChanged {
+  hardware.connectedDeviceNames()
+}
+
 let musicDeviceNode = graph.createMusicDeviceNode()
 let outputNode = graph.createDefaultOutputNode()
 musicDeviceNode.connectTo(outputNode)
@@ -13,10 +17,10 @@ graph.start()
 
 Message.MessageValue.NoteOn.rawValue
 
-hardware.addMessageObserverForDeviceNamed("Samson Carbon49 ") { (message: Message) -> Void in
-  message.statusByte()
-  
+hardware.addMessageObserver { (message: Message) -> Void in
   MusicDeviceMIDIEvent(musicDeviceNode.unit, UInt32(message.statusByte()), UInt32(message.data1Byte()), UInt32(message.data2Byte()), 0)
+}
+
   /*
   switch message {
   case .NoteOn(let channel, let key, let velocity):
@@ -42,7 +46,6 @@ hardware.addMessageObserverForDeviceNamed("Samson Carbon49 ") { (message: Messag
     print("bob")
     break
   }*/
-}
 
 
 XCPlaygroundPage.currentPage.needsIndefiniteExecution = true

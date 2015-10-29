@@ -13,6 +13,9 @@ public enum Message {
   case ChannelPressure(channel: UInt8, pressure: UInt8)
   case PitchBend(channel: UInt8, pitch: UInt16)
 
+  // TODO: We need to store the data in raw form and convert it to the nicer enum on demand. This
+  // implementation is overly-complicated because it's trying to store the data in the nicer enum first.
+
   init?(byteGenerator pop: () -> UInt8) {
     let byte = pop()
     if Message.isStatusByte(byte) {
