@@ -1,8 +1,15 @@
 import CoreMIDI
 
+public struct Event {
+  let timeStamp: MIDITimeStamp
+  let status: UInt8
+  let data1: UInt8
+  let data2: UInt8
+}
+
 /// An individual message sent to or from a MIDI endpoint.
 /// For the complete specification, visit http://www.midi.org/techspecs/Messages.php
-public enum Message {
+enum Message {
 
   // Channel voice messages
   case NoteOff(channel: UInt8, key: UInt8, velocity: UInt8)
@@ -40,7 +47,7 @@ public enum Message {
     return nil
   }
 
-  public func statusByte() -> UInt8 {
+  func statusByte() -> UInt8 {
     switch self {
     case .NoteOff(let data): return (MessageValue.NoteOff.rawValue << UInt8(4)) | data.channel | Message.statusBit
     case .NoteOn(let data): return (MessageValue.NoteOn.rawValue << UInt8(4)) | data.channel | Message.statusBit
@@ -52,7 +59,7 @@ public enum Message {
     }
   }
 
-  public func data1Byte() -> UInt8 {
+  func data1Byte() -> UInt8 {
     switch self {
     case .NoteOff(let data): return data.1
     case .NoteOn(let data): return data.1
@@ -64,7 +71,7 @@ public enum Message {
     }
   }
 
-  public func data2Byte() -> UInt8 {
+  func data2Byte() -> UInt8 {
     switch self {
     case .NoteOff(let data): return data.2
     case .NoteOn(let data): return data.2
@@ -81,7 +88,7 @@ public enum Message {
   static private let messageMask: UInt8 = 0b01110000
   static private let channelMask: UInt8 = 0b00001111
 
-  public enum MessageValue : UInt8 {
+  enum MessageValue : UInt8 {
     case NoteOff = 0
     case NoteOn
     case Aftertouch
@@ -91,17 +98,17 @@ public enum Message {
     case PitchBend
   }
 
-  static private func isStatusByte(byte: UInt8) -> Bool {
+  static func isStatusByte(byte: UInt8) -> Bool {
     return (byte & Message.statusBit) == Message.statusBit
   }
-  static private func isDataByte(byte: UInt8) -> Bool {
+  static func isDataByte(byte: UInt8) -> Bool {
     return (byte & Message.statusBit) == 0
   }
 
-  static private func statusMessage(byte: UInt8) -> MessageValue {
+  static func statusMessage(byte: UInt8) -> MessageValue {
     return MessageValue(rawValue: (byte & Message.messageMask) >> UInt8(4))!
   }
-  static private func statusChannel(byte: UInt8) -> UInt8 {
+  static func statusChannel(byte: UInt8) -> UInt8 {
     return byte & Message.channelMask
   }
 }

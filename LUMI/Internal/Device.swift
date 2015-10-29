@@ -1,7 +1,7 @@
 import CoreMIDI
 
-protocol DeviceMessageReceiver: class {
-  func device(device: Device, didSendMessages: AnyGenerator<Message>)
+protocol DeviceEventReceiver: class {
+  func device(device: Device, didSendEvents: AnyGenerator<Event>)
 }
 
 /**
@@ -38,7 +38,7 @@ class Device {
     }
   }
 
-  weak var messageReceiver: DeviceMessageReceiver?
+  weak var eventReceiver: DeviceEventReceiver?
 
   private let clientRef: MIDIClientRef
   private var deviceRef: MIDIDeviceRef = 0
@@ -112,9 +112,9 @@ extension Device {
   }
 
   private func didReceivePacketList(packetList: UnsafePointer<MIDIPacketList>) {
-    guard let messageReceiver = self.messageReceiver else { return }
+    guard let eventReceiver = self.eventReceiver else { return }
 
-    let messages = anyGenerator(FlattenGenerator(packetList.memory.generate()))
-    messageReceiver.device(self, didSendMessages: messages)
+    let events = anyGenerator(FlattenGenerator(packetList.memory.generate()))
+    eventReceiver.device(self, didSendEvents: events)
   }
 }

@@ -17,8 +17,8 @@ graph.start()
 
 Message.MessageValue.NoteOn.rawValue
 
-hardware.addMessageObserver { (message: Message) -> Void in
-  MusicDeviceMIDIEvent(musicDeviceNode.unit, UInt32(message.statusByte()), UInt32(message.data1Byte()), UInt32(message.data2Byte()), 0)
+hardware.addMessageObserver { (event: Event) -> Void in
+  MusicDeviceMIDIEvent(musicDeviceNode.unit, UInt32(event.status), UInt32(event.data1), UInt32(event.data2), 0)
 }
 
   /*

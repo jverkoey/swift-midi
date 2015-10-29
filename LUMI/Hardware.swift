@@ -52,8 +52,8 @@ import CoreMIDI
 
   private var byUniqueID: [DeviceUniqueID:Device] = [:]
   private var byName: [DeviceName:[Device]] = [:]
-  private let namedMessageObservers: ReadWriteLockProtector<[DeviceName: [(Message) -> Void]]> = ReadWriteLockProtector([:])
-  private let messageObservers: ReadWriteLockProtector<[(Message) -> Void]> = ReadWriteLockProtector([])
+  private let namedMessageObservers: ReadWriteLockProtector<[DeviceName: [(Event) -> Void]]> = ReadWriteLockProtector([:])
+  private let messageObservers: ReadWriteLockProtector<[(Event) -> Void]> = ReadWriteLockProtector([])
   private let setupObserverMap = LockProtector<[() -> Void]>([])
 }
 
@@ -68,11 +68,11 @@ extension Hardware {
     observer()
   }
 
-  public func addMessageObserver(observer: (Message) -> Void) {
+  public func addMessageObserver(observer: (Event) -> Void) {
     self.messageObservers.withWriteLock { $0.append(observer); return }
   }
 
-  public func addMessageObserverForDeviceNamed(deviceName: String, observer: (Message) -> Void) {
+  public func addMessageObserverForDeviceNamed(deviceName: String, observer: (Event) -> Void) {
     self.namedMessageObservers.withWriteLock { $0[deviceName, withDefault: []].append(observer); return }
   }
 }
@@ -99,7 +99,7 @@ extension Hardware {
       MIDIEndpointGetDevice(endpointRef, &deviceRef)
       let uniqueID = propertyOf(deviceRef)!.uniqueID
       let device = byUniqueID[uniqueID, withDefault: Device(self.clientRef)]
-      device.messageReceiver = self
+      device.eventReceiver = self
       return device
     }
 
@@ -149,13 +149,13 @@ extension Hardware {
   }
 }
 
-extension Hardware: DeviceMessageReceiver {
+extension Hardware: DeviceEventReceiver {
 
-  func device(device: Device, didSendMessages messages: AnyGenerator<Message>) {
+  func device(device: Device, didSendEvents events: AnyGenerator<Event>) {
     let deviceName = device.name()
 
     // Gather all observers
-    var observers: [(Message) -> Void] = []
+    var observers: [(Event) -> Void] = []
     observers.appendContentsOf(self.namedMessageObservers.withReadLock { return $0[deviceName] } ?? [])
     observers.appendContentsOf(self.messageObservers.withReadLock { return $0 })
 
@@ -164,9 +164,9 @@ extension Hardware: DeviceMessageReceiver {
     }
 
     // All observers receive events in lockstep.
-    for message in messages {
+    for event in events {
       for observer in observers {
-        observer(message)
+        observer(event)
       }
     }
   }
